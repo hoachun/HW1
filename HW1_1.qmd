@@ -1,11 +1,73 @@
 ---
-title: "HW1_1"
+title: "HW1"
+date: today
+author: Hao-Chun Chen
+format:
+ pdf:
+    include-in-header:
+      - text: |
+         \usepackage{setspace,relsize}
+mainfont: "Microsoft JhengHei UI"
+toc: true
 ---
 
-## Quarto
+```{r,message=FALSE,warning=FALSE}
+#| output: asis
+library(Hmisc)
+library(palmerpenguins)
+latex(describe(penguins_raw), file = "", caption.placement = "top")
+```
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+```{r,message=FALSE,warning=FALSE}
+#| output: asis
+library(Hmisc)
+library(DataExplorer)
+latex(describe(penguins_raw), file = "", caption.placement = "top")
+plot_missing(penguins_raw)
+```
+
+```{r,message=FALSE,warning=FALSE}
+library(dplyr)
+library(ggplot2)
+penguins_raw <- penguins_raw %>%
+  rename(
+    Culmen_Depth = `Culmen Depth (mm)`,
+    Culmen_Length = `Culmen Length (mm)`,
+    Flipper_Length = `Flipper Length (mm)`,
+    Body_Mass = `Body Mass (g)`
+  )
+
+penguin_subset <- penguins_raw %>%
+  select(Species, Culmen_Depth, Culmen_Length, Flipper_Length, Body_Mass) %>% 
+  filter(!is.na(Species), 
+         !is.na(Culmen_Depth), 
+         !is.na(Culmen_Length), 
+         !is.na(Flipper_Length), 
+         !is.na(Body_Mass))
+par(mfrow=c(2,2))
+ggplot(penguin_subset)+
+  geom_density(mapping = aes(x=Body_Mass,fill=Species),alpha=0.5)+
+  ggtitle("Body mass of different species")
+ggplot(penguin_subset)+
+  geom_density(mapping = aes(x=Culmen_Depth,fill=Species),alpha=0.5)+
+  ggtitle("Culmen depth of different species")
+ggplot(penguin_subset)+
+  geom_density(mapping = aes(x=Culmen_Length,fill=Species),alpha=0.5)+
+  ggtitle("Culmen Length of different species")
+ggplot(penguin_subset)+
+  geom_density(mapping = aes(x=Flipper_Length,fill=Species),alpha=0.5)+
+  ggtitle("Flipper_Length of different species")
+```
 
 ```{r}
-1 + 1
+library(corrplot)
+corrplot(
+  cor(penguin_subset[,-1]),
+  method = "number",
+  type = "full",
+  tl.col = "red",
+  tl.cex = 0.75,
+  tl.srt = 30
+)
+
 ```
